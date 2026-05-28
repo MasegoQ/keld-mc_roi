@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KELD Matrix — Commercialisation & ROI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --navy: #0F1E35;
+  --navy-mid: #1B2A4A;
+  --navy-light: #2A3F62;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-pale: rgba(201,168,76,0.12);
+  --teal: #1D9E75;
+  --teal-pale: rgba(29,158,117,0.1);
+  --cream: #F8F6F0;
+  --cream-dark: #EDE9DF;
+  --red: #9B3A1D;
+  --text: #1B2A4A;
+  --text-mid: #4A5568;
+  --text-light: #8A9AB5;
+  --border: rgba(27,42,74,0.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ---- NOISE TEXTURE OVERLAY ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ---- NAV ---- */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 18px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(248,246,240,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-mid);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--navy); }
+
+/* ---- HERO ---- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 48px 80px;
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+  top: -100px; right: -100px;
+}
+.hero-glow-2 {
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(29,158,117,0.1) 0%, transparent 70%);
+  bottom: 100px; left: 200px;
+}
+
+.hero-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  color: #fff;
+  letter-spacing: -0.03em;
+  max-width: 800px;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.4s forwards;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.hero-desc {
+  font-size: 16px;
+  color: rgba(255,255,255,0.55);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.6s forwards;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+
+.hero-stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.hero-stat-value span { color: var(--gold); }
+.hero-stat-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+.hero-divider {
+  width: 1px;
+  background: rgba(255,255,255,0.1);
+  align-self: stretch;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.scroll-hint::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: rgba(255,255,255,0.2);
+}
+
+/* ---- SECTIONS ---- */
+section {
+  padding: 100px 48px;
+}
+
+.section-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-tag::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--gold);
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--text-mid);
+  line-height: 1.7;
+  font-weight: 300;
+  max-width: 560px;
+  margin-bottom: 56px;
+}
+
+/* ---- DARK SECTION ---- */
+.dark-section {
+  background: var(--navy);
+  color: #fff;
+}
+.dark-section .section-title { color: #fff; }
+.dark-section .section-sub { color: rgba(255,255,255,0.5); }
+
+/* ---- METRIC GRID ---- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 64px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.metric-card {
+  background: #fff;
+  padding: 28px 24px;
+  position: relative;
+  transition: background 0.2s;
+}
+.metric-card:hover { background: var(--cream); }
+.metric-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.metric-card:hover::after { opacity: 1; }
+
+.metric-label {
+  font-size: 11px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.metric-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.metric-note {
+  font-size: 12px;
+  color: var(--text-light);
+}
+.mv-green { color: var(--teal); }
+.mv-navy { color: var(--navy); }
+.mv-gold { color: #9A6F00; }
+.mv-red { color: var(--red); }
+
+/* ---- DARK METRICS ---- */
+.dark-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 64px;
+}
+.dark-metric {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: background 0.2s;
+}
+.dark-metric:hover { background: rgba(255,255,255,0.07); }
+.dark-metric .metric-label { color: rgba(255,255,255,0.35); }
+.dark-metric .metric-value { color: #fff; }
+.dark-metric .metric-note { color: rgba(255,255,255,0.3); }
+
+/* ---- CHART CARDS ---- */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.chart-full { grid-column: 1 / -1; }
+
+.chart-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid var(--border);
+}
+.dark-section .chart-card {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+}
+.chart-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.dark-section .chart-card-title { color: #fff; }
+.chart-card-sub {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.dark-section .chart-card-sub { color: rgba(255,255,255,0.35); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-mid);
+  font-weight: 400;
+}
+.dark-section .legend-item { color: rgba(255,255,255,0.5); }
+.swatch {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ---- CALC BOX ---- */
+.calc-box {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.dark-section .calc-box { border-color: rgba(255,255,255,0.08); }
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.dark-section .calc-row { border-color: rgba(255,255,255,0.06); }
+.calc-row:last-child { border-bottom: none; }
+.calc-row.total {
+  background: var(--gold-pale);
+  font-weight: 600;
+  font-size: 15px;
+}
+.dark-section .calc-row.total { background: rgba(201,168,76,0.1); }
+.calc-label { color: var(--text-mid); }
+.dark-section .calc-label { color: rgba(255,255,255,0.5); }
+.calc-value { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; }
+.cv-green { color: var(--teal); }
+.cv-red { color: var(--red); }
+.cv-navy { color: var(--navy); }
+.cv-gold { color: #9A6F00; }
+
+/* ---- HIGHLIGHT BOX ---- */
+.highlight {
+  background: var(--teal-pale);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: #085041;
+  line-height: 1.7;
+}
+.highlight strong { color: var(--teal); font-weight: 600; }
+.dark-section .highlight {
+  background: rgba(29,158,117,0.1);
+  border-color: var(--teal);
+  color: rgba(255,255,255,0.7);
+}
+
+/* ---- OWNERSHIP GRID ---- */
+.owner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.owner-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.owner-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(27,42,74,0.08); }
+.owner-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.owner-card.navy::before { background: var(--navy-mid); }
+.owner-card.teal::before { background: var(--teal); }
+.owner-card.gold::before { background: var(--gold); }
+.owner-card.red::before { background: #8B6A1D; }
+.owner-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-family: 'DM Mono', monospace;
+}
+.badge-navy { background: rgba(27,42,74,0.08); color: var(--navy-mid); }
+.badge-teal { background: rgba(29,158,117,0.1); color: #085041; }
+.badge-gold { background: rgba(201,168,76,0.12); color: #7A5A00; }
+.badge-amber { background: rgba(186,117,23,0.1); color: #7A4800; }
+.owner-card h4 { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+.owner-card p { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+/* ---- PHASE TIMELINE ---- */
+.phase-timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: 48px; }
+.phase-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 0;
+}
+.phase-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.phase-dot {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  color: #fff;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.phase-line {
+  flex: 1;
+  width: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+.phase-item:last-child .phase-line { display: none; }
+.phase-body {
+  padding: 0 0 32px 20px;
+}
+.phase-body h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 6px; padding-top: 8px; }
+.phase-body p { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+/* ---- FEE TABLE ---- */
+.fee-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.fee-table th {
+  background: var(--navy);
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 16px;
+  text-align: left;
+}
+.fee-table td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+  background: #fff;
+}
+.fee-table tr:hover td { background: var(--cream); }
+.stage-name { font-weight: 600; color: var(--navy); font-size: 13px; }
+.stage-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.fee-amount { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--navy); }
+.fee-type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ft-consulting { background: rgba(27,42,74,0.08); color: var(--navy-mid); }
+.ft-licence { background: rgba(29,158,117,0.1); color: #085041; }
+
+/* ---- SCENARIO TABS ---- */
+.scenario-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: rgba(27,42,74,0.06);
+  padding: 4px;
+  border-radius: 10px;
+  width: fit-content;
+}
+.s-tab {
+  padding: 8px 18px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-mid);
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+.s-tab.active {
+  background: var(--navy);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(27,42,74,0.2);
+}
+.dark-section .scenario-tabs { background: rgba(255,255,255,0.06); }
+.dark-section .s-tab { color: rgba(255,255,255,0.4); }
+.dark-section .s-tab.active { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* ---- ROI TABLE ---- */
+.roi-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.dark-section .roi-table { border-color: rgba(255,255,255,0.08); }
+.roi-table th {
+  background: var(--navy);
+  color: rgba(255,255,255,0.6);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 16px;
+  text-align: right;
+  font-weight: 500;
+}
+.roi-table th:first-child { text-align: left; }
+.roi-table td {
+  padding: 11px 16px;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  text-align: right;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-mid);
+}
+.dark-section .roi-table td { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+.roi-table td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; color: var(--text); }
+.dark-section .roi-table td:first-child { color: rgba(255,255,255,0.7); }
+.roi-table td.positive { color: var(--teal); }
+.roi-table td.negative { color: var(--red); }
+.roi-table tr:hover td { background: var(--cream); }
+.dark-section .roi-table tr:hover td { background: rgba(255,255,255,0.05); }
+
+/* ---- FOOTNOTE ---- */
+.fn {
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.dark-section .fn { color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.06); }
+
+/* ---- APPROVAL SECTION ---- */
+.approval-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+.approval-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 28px 24px;
+  position: relative;
+}
+.approval-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 64px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.04);
+  position: absolute;
+  top: 12px; right: 20px;
+  line-height: 1;
+  pointer-events: none;
+}
+.approval-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+.approval-card p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+}
+
+/* ---- FOOTER ---- */
+footer {
+  background: var(--navy);
+  padding: 48px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+.footer-logo span { color: var(--gold); }
+.footer-right {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  text-align: right;
+  line-height: 1.8;
+}
+
+/* ---- ANIMATIONS ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  nav { padding: 16px 20px; }
+  .nav-links { display: none; }
+  section { padding: 64px 20px; }
+  .hero { padding: 0 20px 64px; }
+  .metric-grid, .dark-metric-grid { grid-template-columns: 1fr 1fr; }
+  .chart-grid, .chart-grid-3 { grid-template-columns: 1fr; }
+  .chart-full { grid-column: 1; }
+  .owner-grid { grid-template-columns: 1fr; }
+  .approval-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">KELD <span>Matrix</span></div>
+  <div class="nav-links">
+    <a href="#kumba">Kumba ROI</a>
+    <a href="#keld">KELD MC ROI</a>
+    <a href="#model">Commercial Model</a>
+    <a href="#approval">Investment Case</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+
+  <div class="hero-tag">KELD Matrix Consulting · Phase 4 · 2026</div>
+  <h1 class="hero-title">
+    Commercialisation<br>& <em>Return on</em><br>Investment
+  </h1>
+  <p class="hero-desc">
+    A dual-perspective analysis of the economic return from the KELD Governance Intelligence Layer — for Kumba Iron Ore and for KELD Matrix Consulting.
+  </p>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-value">R22.<span>7M</span></div>
+      <div class="hero-stat-label">Kumba Year 1 value</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div>
+      <div class="hero-stat-value">~<span>7</span></div>
+      <div class="hero-stat-label">Months to break-even</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div>
+      <div class="hero-stat-value"><span>1 000</span>%</div>
+      <div class="hero-stat-label">Kumba 3-year ROI</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div>
+      <div class="hero-stat-value"><span>19</span>%</div>
+      <div class="hero-stat-label">KELD MC base margin</div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll to explore</div>
+</div>
+
+<!-- ===== SECTION 1: KUMBA ROI ===== -->
+<section id="kumba">
+  <div class="section-tag">01 — Client Return</div>
+  <h2 class="section-title reveal">How Kumba captures value</h2>
+  <p class="section-sub reveal">Four economic dimensions. Two are quantified conservatively. Two are material but require Stage 0 validation before final contracting.</p>
+
+  <div class="metric-grid reveal">
+    <div class="metric-card">
+      <div class="metric-label">Reconciliation capacity</div>
+      <div class="metric-value mv-teal" style="color:var(--teal)">R2.74M</div>
+      <div class="metric-note">Per year from Year 1</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Overbilling prevented</div>
+      <div class="metric-value mv-navy">R20M+</div>
+      <div class="metric-note">Conservative: 1 event/quarter</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Audit qualification risk</div>
+      <div class="metric-value mv-gold" style="color:#7A5A00">Material</div>
+      <div class="metric-note">Restatement + investor confidence</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">CBAM revenue protection</div>
+      <div class="metric-value mv-navy">Material</div>
+      <div class="metric-note">EU export penalties from 2026</div>
+    </div>
+  </div>
+
+  <div class="chart-grid reveal">
+    <div>
+      <div class="chart-card-title" style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px">Value Driver 1 — Reconciliation</div>
+      <div class="chart-card-sub" style="font-size:12px;color:var(--text-light);margin-bottom:16px">62 hrs/week × R850 loaded cost × 52 weeks</div>
+      <div class="calc-box">
+        <div class="calc-row"><span class="calc-label">Weekly reconciliation hours</span><span class="calc-value">62 hrs</span></div>
+        <div class="calc-row"><span class="calc-label">Loaded hourly cost</span><span class="calc-value">R850</span></div>
+        <div class="calc-row"><span class="calc-label">Annual weeks</span><span class="calc-value">52</span></div>
+        <div class="calc-row total"><span class="calc-label" style="color:var(--navy)">Annual value recaptured</span><span class="calc-value cv-green">R2 738 800</span></div>
+      </div>
+      <p class="fn">* Assumption A8. Must be validated by time-motion study with Financial Controller team during Stage 0.</p>
+    </div>
+    <div>
+      <div class="chart-card-title" style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px">Value Driver 2 — Overbilling</div>
+      <div class="chart-card-sub" style="font-size:12px;color:var(--text-light);margin-bottom:16px">Conservative estimate based on INV-2026-1142 prototype scenario</div>
+      <div class="calc-box">
+        <div class="calc-row"><span class="calc-label">Prototype anomaly identified</span><span class="calc-value">R9.87M</span></div>
+        <div class="calc-row"><span class="calc-label">Conservative events per year</span><span class="calc-value">4</span></div>
+        <div class="calc-row"><span class="calc-label">Conservative avg. per event</span><span class="calc-value">R5 000 000</span></div>
+        <div class="calc-row total"><span class="calc-label" style="color:var(--navy)">Annual leakage prevented</span><span class="calc-value cv-green">R20 000 000</span></div>
+      </div>
+      <p class="fn">* Deliberately conservative — INV-2026-1142 alone (R9.87M) exceeds the R5M per-event assumption.</p>
+    </div>
+  </div>
+
+  <div class="chart-grid reveal" style="margin-top:32px">
+    <div class="chart-card chart-full">
+      <div class="chart-card-title">Kumba — Cumulative Investment vs Value Delivered</div>
+      <div class="chart-card-sub">Monthly view · Pilot investment R1.6M · Break-even ~Month 7 · Value = reconciliation savings + overbilling prevention</div>
+      <div class="legend">
+        <span class="legend-item"><span class="swatch" style="background:#1B2A4A"></span>Cumulative investment</span>
+        <span class="legend-item"><span class="swatch" style="background:#1D9E75"></span>Cumulative value delivered</span>
+        <span class="legend-item"><span class="swatch" style="background:#C9A84C"></span>Net position</span>
+      </div>
+      <div style="height:280px"><canvas id="kumbaMain"></canvas></div>
+      <p class="fn">* Value line reflects reconciliation savings + conservative overbilling prevention only. Stage 2 fee (R2.8M) not reflected in this pilot-phase view.</p>
+    </div>
+  </div>
+
+  <div class="chart-grid reveal">
+    <div class="chart-card">
+      <div class="chart-card-title">Break-Even Calculation</div>
+      <div class="chart-card-sub">Pilot investment recovered within ~7 months of engagement start</div>
+      <div class="calc-box" style="margin-bottom:0">
+        <div class="calc-row"><span class="calc-label">Stage 0 discovery</span><span class="calc-value cv-red">−R350 000</span></div>
+        <div class="calc-row"><span class="calc-label">Stage 1 pilot</span><span class="calc-value cv-red">−R1 250 000</span></div>
+        <div class="calc-row"><span class="calc-label">Monthly reconciliation value</span><span class="calc-value cv-green">+R228 233</span></div>
+        <div class="calc-row"><span class="calc-label">Monthly overbilling prevention</span><span class="calc-value cv-green">+R1 666 667</span></div>
+        <div class="calc-row"><span class="calc-label">Total monthly value (from M3)</span><span class="calc-value cv-green">+R1 894 900</span></div>
+        <div class="calc-row total"><span class="calc-label" style="color:var(--navy)">Break-even point</span><span class="calc-value" style="color:var(--navy);font-family:'DM Mono',monospace">~Month 7</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">3-Year Return Summary</div>
+      <div class="chart-card-sub">Conservative quantified drivers only · Excludes audit risk and CBAM upside</div>
+      <div style="height:200px"><canvas id="kumbaBar"></canvas></div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:8px">
+    <div class="calc-box">
+      <div class="calc-row"><span class="calc-label">Total 3-year investment (pilot + Stage 2 + 2 retainers)</span><span class="calc-value cv-red">−R6 200 000</span></div>
+      <div class="calc-row"><span class="calc-label">Total 3-year value (conservative, quantified drivers only)</span><span class="calc-value cv-green">+R68 200 000</span></div>
+      <div class="calc-row"><span class="calc-label">3-year net benefit</span><span class="calc-value cv-green">+R62 000 000</span></div>
+      <div class="calc-row total"><span class="calc-label" style="color:var(--navy)">3-year ROI</span><span class="calc-value cv-green">~1 000%</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2: KELD MC ROI ===== -->
+<section id="keld" class="dark-section">
+  <div class="section-tag">02 — Consulting Firm Return</div>
+  <h2 class="section-title reveal">KELD MC's own return</h2>
+  <p class="section-sub reveal">The base engagement delivers a 19% margin — acceptable but not exceptional. The real ROI story is the retainer, Kolomela replication, and Anglo American group scale.</p>
+
+  <div class="dark-metric-grid reveal">
+    <div class="dark-metric">
+      <div class="metric-label">Total 3-year revenue</div>
+      <div class="metric-value" style="color:#fff">R7.95M</div>
+      <div class="metric-note">All stages + retainers</div>
+    </div>
+    <div class="dark-metric">
+      <div class="metric-label">Total 3-year cost</div>
+      <div class="metric-value" style="color:#E87060">R6.46M</div>
+      <div class="metric-note">People + infra + ops</div>
+    </div>
+    <div class="dark-metric">
+      <div class="metric-label">3-year net profit</div>
+      <div class="metric-value" style="color:#1D9E75">R1.49M</div>
+      <div class="metric-note">Base engagement only</div>
+    </div>
+    <div class="dark-metric">
+      <div class="metric-label">Base margin</div>
+      <div class="metric-value" style="color:var(--gold)">~19%</div>
+      <div class="metric-note">Scales with replication</div>
+    </div>
+  </div>
+
+  <div class="highlight reveal">
+    <strong>The base engagement margin is 19%</strong> — acceptable for a specialist consulting firm on a first client. The strategic value is the retainer (high-margin recurring revenue), Kolomela (built architecture, ~50% lower delivery cost), and Anglo American group replication (up to R25M additional revenue from already-built product).
+  </div>
+
+  <div class="chart-card reveal" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;margin-bottom:24px">
+    <div class="chart-card-title">KELD MC — Cumulative Revenue vs Cost vs Net Position</div>
+    <div class="chart-card-sub">Switch scenarios to see how Kolomela and group replication change the picture dramatically</div>
+    <div class="scenario-tabs" id="scenarioTabs">
+      <button class="s-tab active" onclick="setScenario('base', this)">Base (Sishen only)</button>
+      <button class="s-tab" onclick="setScenario('kolomela', this)">+ Kolomela</button>
+      <button class="s-tab" onclick="setScenario('group', this)">+ 3 Group sites</button>
+    </div>
+    <div class="legend">
+      <span class="legend-item"><span class="swatch" style="background:#C9A84C"></span>Cumulative revenue</span>
+      <span class="legend-item"><span class="swatch" style="background:#E87060"></span>Cumulative cost</span>
+      <span class="legend-item"><span class="swatch" style="background:#1D9E75"></span>Net position</span>
+    </div>
+    <div style="height:280px"><canvas id="keldMain"></canvas></div>
+    <p class="fn" id="keldNote">* Base: Sishen engagement only. 4-person team, 40% allocation, R1.5M loaded annual cost each. Break-even at ~Month 14.</p>
+  </div>
+
+  <div class="chart-grid reveal">
+    <div class="chart-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+      <div class="chart-card-title">Revenue by Stage</div>
+      <div class="chart-card-sub">Each stage's contribution to total 3-year revenue</div>
+      <div style="height:220px"><canvas id="keldWaterfall"></canvas></div>
+    </div>
+    <div class="chart-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+      <div class="chart-card-title">Gross Margin by Stage</div>
+      <div class="chart-card-sub">Why retainer and scale-up stages are strategically more valuable</div>
+      <div style="height:220px"><canvas id="keldMargin"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-card reveal" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px">
+    <div class="chart-card-title">Cost Structure — 3-Year Delivery</div>
+    <div class="chart-card-sub">89% of KELD MC costs are people — the honest number, and why replication dramatically improves margin</div>
+    <div style="height:180px"><canvas id="keldCost"></canvas></div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3: COMMERCIAL MODEL ===== -->
+<section id="model">
+  <div class="section-tag">03 — Commercial Model</div>
+  <h2 class="section-title reveal">How Kumba is charged</h2>
+  <p class="section-sub reveal">Fees are anchored to delivered outcomes at each stage, not to hours or headcount. Every stage fee is set below the conservative value case for that stage.</p>
+
+  <div class="reveal">
+    <table class="fee-table">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Duration</th>
+          <th>Fee</th>
+          <th>Type</th>
+          <th>What Kumba receives</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="stage-name">Stage 0</div><div class="stage-sub">Discovery & design</div></td>
+          <td>2 weeks</td>
+          <td class="fee-amount">R350 000</td>
+          <td><span class="fee-type ft-consulting">Consulting</span></td>
+          <td>Systems map, SAP boundary confirmation, data privacy sign-off, HSE safety assessment submitted</td>
+        </tr>
+        <tr>
+          <td><div class="stage-name">Stage 1</div><div class="stage-sub">Sishen pilot</div></td>
+          <td>8 weeks</td>
+          <td class="fee-amount">R1 250 000</td>
+          <td><span class="fee-type ft-consulting">Consulting</span></td>
+          <td>Working integration overlay, GPS contractor invoice matching, Pull-Enrich-Push cycle, go/no-go report</td>
+        </tr>
+        <tr>
+          <td><div class="stage-name">Stage 2</div><div class="stage-sub">Full Sishen roll-out</div></td>
+          <td>3 months</td>
+          <td class="fee-amount">R2 800 000</td>
+          <td><span class="fee-type ft-consulting">Consulting</span></td>
+          <td>All six modules live, ESG/King V/CBAM automation active, union briefings completed, users trained</td>
+        </tr>
+        <tr>
+          <td><div class="stage-name">Annual retainer</div><div class="stage-sub">Recurring</div></td>
+          <td>Ongoing</td>
+          <td class="fee-amount">R900 000 p.a.</td>
+          <td><span class="fee-type ft-licence">Licence + retainer</span></td>
+          <td>System uptime SLA, compliance template updates (King V / CBAM), quarterly Audit Committee reporting</td>
+        </tr>
+        <tr>
+          <td><div class="stage-name">Stage 3</div><div class="stage-sub">Kolomela scale-up</div></td>
+          <td>6–12 months</td>
+          <td class="fee-amount">R1.5M – R2M</td>
+          <td><span class="fee-type ft-licence">Consulting + licence</span></td>
+          <td>Kolomela deployment using Sishen architecture, Anglo American group replication pathway opened</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight reveal">
+    <strong>The Stage 0 + Stage 1 pilot costs R1.6M total</strong> — less than the R9.87M overbilling exposure demonstrated on a single invoice (INV-2026-1142). Kumba is not making a long-term technology bet. They are spending less than one anomaly is worth to find out whether the system works.
+  </div>
+
+  <div class="section-tag" style="margin-top:56px">KELD MC's role over time</div>
+  <h3 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--navy);margin-bottom:8px;margin-top:12px" class="reveal">Three phases of engagement</h3>
+  <p class="section-sub reveal" style="margin-bottom:32px">KELD MC's role shifts deliberately — building independence for Kumba at every stage.</p>
+
+  <div class="phase-timeline reveal">
+    <div class="phase-item">
+      <div class="phase-spine">
+        <div class="phase-dot" style="background:var(--navy-mid)">1</div>
+        <div class="phase-line"></div>
+      </div>
+      <div class="phase-body">
+        <h4>Implementation Partner — Stages 0 & 1 (Weeks 1–10)</h4>
+        <p>KELD MC deploys the integration layer, configures all six modules, conducts API compatibility testing with Kumba IT, supports the NUM/AMCU union briefing process, and delivers the 90-day diagnostic report with a formal go/no-go recommendation. Billed as a fixed-fee consulting engagement.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-spine">
+        <div class="phase-dot" style="background:var(--teal)">2</div>
+        <div class="phase-line"></div>
+      </div>
+      <div class="phase-body">
+        <h4>Managed Service Provider — Stage 2 onwards (Months 3–12+)</h4>
+        <p>Once live, KELD MC maintains the API integration layer as SAP updates, updates compliance templates as King V, JSE, CBAM, and Mining Charter III requirements evolve, and delivers quarterly Audit Committee governance reports. Billed as an annual retainer — recurring revenue with low marginal cost.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-spine">
+        <div class="phase-dot" style="background:#BA7517">3</div>
+        <div class="phase-line"></div>
+      </div>
+      <div class="phase-body">
+        <h4>Scale Partner — Stage 3 (Months 12–24)</h4>
+        <p>When Kolomela scale-up is approved, KELD MC returns with institutional knowledge of Kumba's SAP configuration already built. Architecture, compliance templates, and integration logic are reused — making Kolomela faster and cheaper than Sishen. Anglo American's 56 global SAP sites are the long-term product replication upside.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 4: INVESTMENT CASE ===== -->
+<section id="approval" class="dark-section">
+  <div class="section-tag">04 — Investment Case</div>
+  <h2 class="section-title reveal">How Kumba justifies the investment</h2>
+  <p class="section-sub reveal">Under earnings compression and conservative CAPEX discipline, the commercial case must be structured to survive procurement review. Three principles make it approvable.</p>
+
+  <div class="approval-grid reveal">
+    <div class="approval-card">
+      <div class="approval-number">1</div>
+      <h3>Opex framing, not capex</h3>
+      <p>Stage 0 and Stage 1 (R1.6M total) are positioned as operational expenditure — diagnostic consulting work. This bypasses the capital approval discipline that would otherwise delay or block the engagement under current earnings pressure. No board-level CAPEX sign-off required to start.</p>
+    </div>
+    <div class="approval-card">
+      <div class="approval-number">2</div>
+      <h3>The pilot costs less than one anomaly</h3>
+      <p>R1.6M pilot investment is less than the R9.87M overbilling exposure on a single invoice. This is a demonstrated anomaly with a known rand value. A CFO under earnings pressure can approve this as insurance against a known risk — not a bet on unproven technology.</p>
+    </div>
+    <div class="approval-card">
+      <div class="approval-number">3</div>
+      <h3>Staged gates protect Kumba</h3>
+      <p>No further investment is committed until measurable improvement is confirmed at each decision gate. Kumba has a formal exit after Stage 1 if GPS data quality is insufficient or API access is blocked. This removes the primary objection to a multi-year technology commitment under earnings pressure.</p>
+    </div>
+  </div>
+
+  <div class="chart-card reveal" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px">
+    <div class="chart-card-title">24-Month Cumulative ROI Schedule — Kumba's Perspective</div>
+    <div class="chart-card-sub">Key milestones showing when cumulative value exceeds cumulative investment</div>
+    <table class="roi-table" style="margin-top:16px">
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th>Cumulative Cost</th>
+          <th>Cumulative Value</th>
+          <th>Net Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Month 0 — Stage 0 signed</td><td class="negative">R350 000</td><td>—</td><td class="negative">(R350 000)</td></tr>
+        <tr><td>Month 2 — Pilot deployed</td><td class="negative">R1 600 000</td><td>—</td><td class="negative">(R1 600 000)</td></tr>
+        <tr><td>Month 3 — First value cycle</td><td class="negative">R1 600 000</td><td class="positive">R1 894 900</td><td class="positive">R294 900</td></tr>
+        <tr><td>Month 6 — Quarter complete</td><td class="negative">R1 600 000</td><td class="positive">R7 579 600</td><td class="positive">R5 979 600</td></tr>
+        <tr><td>Month 7 — Break-even</td><td class="negative">R1 600 000</td><td class="positive">R9 474 500</td><td class="positive">R7 874 500</td></tr>
+        <tr><td>Month 12 — Year 1</td><td class="negative">R1 600 000</td><td class="positive">R18 949 000</td><td class="positive">R17 349 000</td></tr>
+        <tr><td>Month 24 — Year 2</td><td class="negative">R3 400 000</td><td class="positive">R37 898 000</td><td class="positive">R34 498 000</td></tr>
+        <tr><td>Month 36 — Year 3</td><td class="negative">R6 200 000</td><td class="positive">R68 200 000</td><td class="positive">R62 000 000</td></tr>
+      </tbody>
+    </table>
+    <p class="fn">* Conservative basis: quantified value drivers only (reconciliation + overbilling). Excludes audit qualification risk reduction and CBAM revenue protection. Stage 2 fee included in Years 2–3 cost figure.</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 5: OWNERSHIP ===== -->
+<section>
+  <div class="section-tag">05 — Governance Structure</div>
+  <h2 class="section-title reveal">Who owns the solution inside Kumba</h2>
+  <p class="section-sub reveal">KELD Core is designed so Kumba retains full operational control after delivery. A steering committee of all four owners approves each staged decision gate.</p>
+
+  <div class="owner-grid reveal">
+    <div class="owner-card navy">
+      <span class="owner-badge badge-navy">Operational Owner</span>
+      <h4>Sishen Financial Controller</h4>
+      <p>Primary business owner during and after the pilot. Governs invoice verification, Capex/Opex classification, and exception management. Serves as internal champion through procurement and IT approval processes.</p>
+    </div>
+    <div class="owner-card teal">
+      <span class="owner-badge badge-teal">Governance Owner</span>
+      <h4>Group Compliance & Audit Committee</h4>
+      <p>Owns audit trail, ESG reporting outputs, and King V disclosure templates at enterprise level. Reviews governance health annually. Escalation point for classification disputes and regulatory queries.</p>
+    </div>
+    <div class="owner-card red">
+      <span class="owner-badge badge-amber">Integration Owner</span>
+      <h4>Kumba IT / SAP Owner</h4>
+      <p>Validates and maintains the API integration boundary. Confirms SAP OData API access before each stage. Approves all changes to the Pull-Enrich-Push data pipeline configuration.</p>
+    </div>
+    <div class="owner-card gold">
+      <span class="owner-badge badge-gold">Safety Owner</span>
+      <h4>HSE Function</h4>
+      <p>Approves the safety impact assessment before pilot go-live. Confirms latency thresholds for safety-critical real-time alerts. Signs off on passive data capture design under the Mine Health and Safety Act.</p>
+    </div>
+  </div>
+
+  <p class="fn reveal">All financial figures are illustrative estimates based on publicly available Kumba operational data and conservative assumptions. Final figures must be validated during Stage 0 discovery. Assumptions A4 (SAP API access) and A5 (GPS data reliability) are the two highest-risk assumptions and must be tested first. KELD Matrix Consulting · Group 34 · OBS 317 · Phase 4 · 2026.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">KELD <span>Matrix</span> Consulting</div>
+    <div class="footer-right">
+      OBS 317 · Phase 4 · Group 34 · 2026<br>
+      Prepared for Kumba Iron Ore — Anglo American Group<br>
+      KELD Governance Intelligence Layer
+    </div>
+  </div>
+</footer>
+
+<script>
+// ---- REVEAL ON SCROLL ----
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ---- CHART DEFAULTS ----
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+const NAVY = '#1B2A4A';
+const GOLD = '#C9A84C';
+const TEAL = '#1D9E75';
+const RED = '#E87060';
+const AMBER = '#BA7517';
+const GRAY = '#8A9AB5';
+
+// ---- KUMBA MAIN CHART ----
+const kumbaMonths = Array.from({length:25},(_,i)=>i%4===0?`M${i}`:'');
+const monthlyVal = 1894900;
+let kumbaRev=[],kumbaCost=[],kumbaNet=[];
+let cr=0,cc=0;
+for(let m=0;m<=24;m++){
+  if(m===0) cc+=350000;
+  if(m===2) cc+=1250000;
+  if(m>=3) cr+=monthlyVal;
+  kumbaRev.push(Math.round(cr/1e6*100)/100);
+  kumbaCost.push(Math.round(cc/1e6*100)/100);
+  kumbaNet.push(Math.round((cr-cc)/1e6*100)/100);
+}
+new Chart(document.getElementById('kumbaMain'),{
+  type:'line',
+  data:{
+    labels:kumbaMonths,
+    datasets:[
+      {label:'Cumulative investment',data:kumbaCost,borderColor:NAVY,backgroundColor:'rgba(27,42,74,0.06)',borderWidth:2,pointRadius:0,fill:false,tension:0.3},
+      {label:'Cumulative value',data:kumbaRev,borderColor:TEAL,backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:0,fill:false,tension:0.3},
+      {label:'Net position',data:kumbaNet,borderColor:GOLD,backgroundColor:'rgba(201,168,76,0.1)',borderWidth:2,pointRadius:0,fill:true,tension:0.3,borderDash:[5,3]},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: R${ctx.parsed.y}M`}}},
+    scales:{
+      x:{ticks:{font:{size:11},color:GRAY},grid:{color:'rgba(0,0,0,0.04)'}},
+      y:{ticks:{font:{size:11},color:GRAY,callback:v=>`R${v}M`},grid:{color:'rgba(0,0,0,0.04)'}}
+    }
+  }
+});
+
+// ---- KUMBA BAR ----
+new Chart(document.getElementById('kumbaBar'),{
+  type:'bar',
+  data:{
+    labels:['Year 1','Year 2','Year 3'],
+    datasets:[
+      {label:'KELD cost',data:[1.6,0.9,0.9],backgroundColor:NAVY,borderRadius:4},
+      {label:'Recon savings',data:[2.74,2.74,2.74],backgroundColor:TEAL,borderRadius:4},
+      {label:'Overbilling prevented',data:[20,20,20],backgroundColor:AMBER,borderRadius:4},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'#555',padding:10,boxWidth:8}}},
+    scales:{
+      x:{ticks:{font:{size:10},color:GRAY},grid:{display:false}},
+      y:{ticks:{font:{size:10},color:GRAY,callback:v=>`R${v}M`},grid:{color:'rgba(0,0,0,0.04)'}}
+    }
+  }
+});
+
+// ---- KELD MC MAIN CHART ----
+function buildKeldScenario(scenario){
+  const months=36;
+  const fixedMonthly=(1500000*4*0.4/12)+(400000+180000+120000)/36;
+  let rev=new Array(months+1).fill(0);
+  let cost=new Array(months+1).fill(0);
+  rev[0]+=350000; rev[2]+=1250000; rev[5]+=2800000;
+  for(let m=6;m<=months;m++) rev[m]+=75000;
+  if(scenario==='kolomela'||scenario==='group'){
+    rev[14]+=1750000;
+    for(let m=20;m<=months;m++) rev[m]+=62500;
+  }
+  if(scenario==='group'){
+    rev[20]+=2000000; rev[26]+=2000000; rev[32]+=2000000;
+    for(let m=26;m<=months;m++) rev[m]+=50000;
+  }
+  for(let m=0;m<=months;m++){
+    cost[m]=fixedMonthly;
+    if(m<=2) cost[m]+=80000;
+    if(m>=5&&m<=8) cost[m]+=120000;
+    if(scenario!=='base'&&m>=14&&m<=17) cost[m]+=80000;
+    if(scenario==='group'){
+      if(m>=20&&m<=23) cost[m]+=60000;
+      if(m>=26&&m<=29) cost[m]+=60000;
+      if(m>=32&&m<=35) cost[m]+=60000;
+    }
+  }
+  let cumRev=[],cumCost=[],cumNet=[];
+  let cR=0,cC=0;
+  for(let m=0;m<=months;m++){
+    cR+=rev[m]; cC+=cost[m];
+    cumRev.push(Math.round(cR/1000)); cumCost.push(Math.round(cC/1000)); cumNet.push(Math.round((cR-cC)/1000));
+  }
+  return{cumRev,cumCost,cumNet};
+}
+
+const keldLabels=Array.from({length:37},(_,i)=>i%6===0?`M${i}`:'');
+let keldChart;
+function buildKeldMain(scenario){
+  const d=buildKeldScenario(scenario);
+  const notes={
+    base:'* Base: Sishen only. 4-person team, 40% allocation, R1.5M loaded annual cost each. Break-even ~Month 14.',
+    kolomela:'* Includes Kolomela at Month 14 (R1.75M). Reused architecture ~50% lower delivery cost. Earlier break-even.',
+    group:'* Includes 3 Anglo American group deployments from Month 20 (R2M each). Demonstrates product replication upside.'
+  };
+  document.getElementById('keldNote').textContent=notes[scenario];
+  if(keldChart) keldChart.destroy();
+  keldChart=new Chart(document.getElementById('keldMain'),{
+    type:'line',
+    data:{
+      labels:keldLabels,
+      datasets:[
+        {label:'Cumulative revenue',data:d.cumRev,borderColor:GOLD,backgroundColor:'rgba(201,168,76,0.05)',borderWidth:2,pointRadius:0,fill:false,tension:0.3},
+        {label:'Cumulative cost',data:d.cumCost,borderColor:RED,backgroundColor:'rgba(232,112,96,0.05)',borderWidth:2,pointRadius:0,fill:false,tension:0.3},
+        {label:'Net position',data:d.cumNet,borderColor:TEAL,backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:0,fill:true,tension:0.3,borderDash:[5,3]},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: R${ctx.parsed.y.toLocaleString()}K`}}},
+      scales:{
+        x:{ticks:{font:{size:11},color:'rgba(255,255,255,0.3)'},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{font:{size:11},color:'rgba(255,255,255,0.3)',callback:v=>`R${v}K`},grid:{color:'rgba(255,255,255,0.04)'}}
+      }
+    }
+  });
+}
+buildKeldMain('base');
+
+function setScenario(s,btn){
+  document.querySelectorAll('.s-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  buildKeldMain(s);
+}
+
+// ---- KELD WATERFALL ----
+new Chart(document.getElementById('keldWaterfall'),{
+  type:'bar',
+  data:{
+    labels:['Stage 0','Stage 1','Stage 2','Retainer\n(2yr)','Stage 3\nKolomela'],
+    datasets:[{
+      data:[350,1250,2800,1800,1750],
+      backgroundColor:[
+        'rgba(27,42,74,0.4)','rgba(27,42,74,0.6)',NAVY,TEAL,AMBER
+      ],
+      borderColor:['rgba(255,255,255,0.1)','rgba(255,255,255,0.1)','rgba(255,255,255,0.2)','rgba(29,158,117,0.5)','rgba(186,117,23,0.5)'],
+      borderWidth:1,borderRadius:6,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`R${(ctx.parsed.y*1000).toLocaleString()}`}}},
+    scales:{
+      x:{ticks:{font:{size:10},color:'rgba(255,255,255,0.35)'},grid:{display:false}},
+      y:{ticks:{font:{size:10},color:'rgba(255,255,255,0.3)',callback:v=>`R${v}K`},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+// ---- KELD MARGIN ----
+new Chart(document.getElementById('keldMargin'),{
+  type:'bar',
+  data:{
+    labels:['Stage 0','Stage 1','Stage 2','Retainer','Stage 3'],
+    datasets:[
+      {label:'Revenue',data:[350,1250,2800,900,1750],backgroundColor:GOLD,borderRadius:4},
+      {label:'Delivery cost',data:[280,960,2240,120,875],backgroundColor:'rgba(255,255,255,0.1)',borderRadius:4},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom',labels:{font:{size:10},color:'rgba(255,255,255,0.4)',padding:10,boxWidth:8}},
+      tooltip:{callbacks:{
+        footer:items=>{
+          const r=items.find(i=>i.dataset.label==='Revenue')?.parsed.y;
+          const c=items.find(i=>i.dataset.label==='Delivery cost')?.parsed.y;
+          if(r&&c) return[`Margin: ${Math.round((r-c)/r*100)}%`];
+        }
+      }}
+    },
+    scales:{
+      x:{ticks:{font:{size:10},color:'rgba(255,255,255,0.35)'},grid:{display:false}},
+      y:{ticks:{font:{size:10},color:'rgba(255,255,255,0.3)',callback:v=>`R${v}K`},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+// ---- KELD COST DONUT ----
+new Chart(document.getElementById('keldCost'),{
+  type:'doughnut',
+  data:{
+    labels:['People (team costs)','Tech infrastructure','Site travel','Legal & compliance'],
+    datasets:[{
+      data:[5760,400,180,120],
+      backgroundColor:[NAVY,TEAL,AMBER,'rgba(255,255,255,0.2)'],
+      borderWidth:0,hoverOffset:8,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'right',labels:{font:{size:11},color:'rgba(255,255,255,0.5)',padding:12,boxWidth:10}},
+      tooltip:{callbacks:{label:ctx=>`R${ctx.parsed.toLocaleString()} · ${Math.round(ctx.parsed/6460*100)}%`}}
+    },
+    cutout:'65%'
+  }
+});
+</script>
+</body>
+</html>
